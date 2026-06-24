@@ -1,0 +1,51 @@
+baseURL = 'https://zlh20040308.github.io/'
+locale = 'en-US'
+title = "Feng's Notes"
+theme = 'hugo-ivy'
+ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_cache$"]
+preserveTaxonomyNames = true
+footnotereturnlinkcontents = '↩'
+
+permalinks:
+  note: '/note/:slug/'
+  post: '/post/:slug/'
+
+menu:
+  main:
+    - name: 'Home'
+      url: '/'
+      weight: 1
+    - name: 'About'
+      url: '/about/'
+      weight: 2
+    - name: 'Categories'
+      url: '/categories/'
+      weight: 3
+    - name: 'Tags'
+      url: '/tags/'
+      weight: 4
+    - name: 'Subscribe'
+      url: '/index.xml'
+      weight: 5
+
+params:
+  description: "Feng's personal notes"
+  footer: '&copy; [Feng](https://github.com/zlh20040308) {Year}'
+  highlightjsLang: ['latex', 'python', 'rust', 'nix', 'bash', 'yaml', 'toml', 'json']
+  highlightjsTheme: 'github'
+  highlightjsVersion: '11.7.0'
+
+security:
+  allowContent:
+    - '.*'
+  funcs:
+    getenv:
+      - '^HUGO_'
+      - '^CI$'
+
+markup:
+  highlight:
+    codeFences: false
+  goldmark:
+    renderer:
+      unsafe: true
