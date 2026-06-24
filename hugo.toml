@@ -6,46 +6,52 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_cache$"]
 preserveTaxonomyNames = true
 footnotereturnlinkcontents = '↩'
 
-permalinks:
-  note: '/note/:slug/'
-  post: '/post/:slug/'
+[permalinks]
+  note = '/note/:slug/'
+  post = '/post/:slug/'
 
-menu:
-  main:
-    - name: 'Home'
-      url: '/'
-      weight: 1
-    - name: 'About'
-      url: '/about/'
-      weight: 2
-    - name: 'Categories'
-      url: '/categories/'
-      weight: 3
-    - name: 'Tags'
-      url: '/tags/'
-      weight: 4
-    - name: 'Subscribe'
-      url: '/index.xml'
-      weight: 5
+[[menu.main]]
+  name = 'Home'
+  url = '/'
+  weight = 1
 
-params:
-  description: "Feng's personal notes"
-  footer: '&copy; [Feng](https://github.com/zlh20040308) {Year}'
-  highlightjsLang: ['latex', 'python', 'rust', 'nix', 'bash', 'yaml', 'toml', 'json']
-  highlightjsTheme: 'github'
-  highlightjsVersion: '11.7.0'
+[[menu.main]]
+  name = 'About'
+  url = '/about/'
+  weight = 2
 
-security:
-  allowContent:
-    - '.*'
-  funcs:
-    getenv:
-      - '^HUGO_'
-      - '^CI$'
+[[menu.main]]
+  name = 'Categories'
+  url = '/categories/'
+  weight = 3
 
-markup:
-  highlight:
-    codeFences: false
-  goldmark:
-    renderer:
-      unsafe: true
+[[menu.main]]
+  name = 'Tags'
+  url = '/tags/'
+  weight = 4
+
+[[menu.main]]
+  name = 'Subscribe'
+  url = '/index.xml'
+  weight = 5
+
+[params]
+  description = "Feng's personal notes"
+  footer = '&copy; [Feng](https://github.com/zlh20040308) {Year}'
+  highlightjsLang = ['latex', 'python', 'rust', 'nix', 'bash', 'yaml', 'toml', 'json']
+  highlightjsTheme = 'github'
+  highlightjsVersion = '11.7.0'
+
+[security]
+  allowContent = ['.*']
+
+  [security.funcs]
+    getenv = ['^HUGO_', '^CI$']
+
+[markup]
+  [markup.highlight]
+    codeFences = false
+
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
