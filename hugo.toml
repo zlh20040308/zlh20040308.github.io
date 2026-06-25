@@ -30,11 +30,6 @@ footnotereturnlinkcontents = '↩'
   url = '/tags/'
   weight = 4
 
-[[menu.main]]
-  name = 'Subscribe'
-  url = '/index.xml'
-  weight = 5
-
 [params]
   description = "Feng's personal notes"
   footer = '&copy; [Feng](https://github.com/zlh20040308) {Year}'
