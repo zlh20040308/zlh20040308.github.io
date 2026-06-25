@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>NixOS on Feng's Notes</title><link>https://zlh20040308.github.io/categories/nixos/</link><description>Recent content in NixOS on Feng's Notes</description><generator>Hugo</generator><language>en-US</language><lastBuildDate>Thu, 25 Jun 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://zlh20040308.github.io/categories/nixos/index.xml" rel="self" type="application/rss+xml"/><item><title>Getting Started</title><link>https://zlh20040308.github.io/note/getting-started/</link><pubDate>Thu, 25 Jun 2026 00:00:00 +0000</pubDate><guid>https://zlh20040308.github.io/note/getting-started/</guid><description>&lt;p&gt;This is my first note. Hugo with the &lt;a href="https://github.com/yihui/hugo-ivy"&gt;hugo-ivy&lt;/a&gt; theme looks clean.&lt;/p&gt;
+&lt;h2 id="how-to-create-a-new-note"&gt;How to create a new note&lt;/h2&gt;
+&lt;pre&gt;&lt;code class="language-bash"&gt;hugo new content note/my-note-title.md
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Then edit the file and add &lt;code&gt;categories&lt;/code&gt; and &lt;code&gt;tags&lt;/code&gt; in the frontmatter.&lt;/p&gt;
+&lt;h2 id="how-to-preview"&gt;How to preview&lt;/h2&gt;
+&lt;pre&gt;&lt;code class="language-bash"&gt;hugo server -D
+&lt;/code&gt;&lt;/pre&gt;</description></item></channel></rss>
