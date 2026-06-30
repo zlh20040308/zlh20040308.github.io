@@ -1,6 +1,6 @@
 ---
 date: '2026-06-28'
-draft: true
+draft: false
 title: 'Debug：IntelliJ IDEA 在 NixOS 上无法编译 / 自动补全'
 categories: ["NixOS"]
 tags: ["nix", "idea", "nix-ld", "debug", "FHS"]
