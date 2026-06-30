@@ -1,4 +1,23 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Nix on Feng's Notes</title><link>https://zlh20040308.github.io/tags/nix/</link><description>Recent content in Nix on Feng's Notes</description><generator>Hugo</generator><language>en-US</language><lastBuildDate>Thu, 25 Jun 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://zlh20040308.github.io/tags/nix/index.xml" rel="self" type="application/rss+xml"/><item><title>Getting Started</title><link>https://zlh20040308.github.io/note/getting-started/</link><pubDate>Thu, 25 Jun 2026 00:00:00 +0000</pubDate><guid>https://zlh20040308.github.io/note/getting-started/</guid><description>&lt;p&gt;This is my first note. Hugo with the &lt;a href="https://github.com/yihui/hugo-ivy"&gt;hugo-ivy&lt;/a&gt; theme looks clean.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Nix on Feng's Notes</title><link>https://zlh20040308.github.io/tags/nix/</link><description>Recent content in Nix on Feng's Notes</description><generator>Hugo</generator><language>en-US</language><lastBuildDate>Sun, 28 Jun 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://zlh20040308.github.io/tags/nix/index.xml" rel="self" type="application/rss+xml"/><item><title>Debug：IntelliJ IDEA 在 NixOS 上无法编译 / 自动补全</title><link>https://zlh20040308.github.io/note/debugintellij-idea-%E5%9C%A8-nixos-%E4%B8%8A%E6%97%A0%E6%B3%95%E7%BC%96%E8%AF%91-/-%E8%87%AA%E5%8A%A8%E8%A1%A5%E5%85%A8/</link><pubDate>Sun, 28 Jun 2026 00:00:00 +0000</pubDate><guid>https://zlh20040308.github.io/note/debugintellij-idea-%E5%9C%A8-nixos-%E4%B8%8A%E6%97%A0%E6%B3%95%E7%BC%96%E8%AF%91-/-%E8%87%AA%E5%8A%A8%E8%A1%A5%E5%85%A8/</guid><description>&lt;h2 id="现象"&gt;现象&lt;/h2&gt;
+&lt;p&gt;在 NixOS 上用 IDEA 打开一个 Gradle/Java 项目后：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;没有自动补全&lt;/li&gt;
+&lt;li&gt;Build 失败&lt;/li&gt;
+&lt;li&gt;IDEA 报错：&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;Abnormal build process termination:
+Could not start dynamically linked executable: /home/feng/.jdks/azul-17.0.19/bin/java
+NixOS cannot run dynamically linked executables intended for generic
+linux environments out of the box.
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id="排查"&gt;排查&lt;/h2&gt;
+&lt;p&gt;IDEA 试图启动自己下载的 Azul JDK 17（&lt;code&gt;~/.jdks/azul-17.0.19/bin/java&lt;/code&gt;）来跑 Build Process。&lt;/p&gt;
+&lt;p&gt;手动试一下：&lt;/p&gt;
+&lt;pre&gt;&lt;code class="language-bash"&gt;~/.jdks/azul-17.0.19/bin/java -version
+# Could not start dynamically linked executable
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;确认了 — 这个二进制在 NixOS 上根本无法运行。&lt;/p&gt;
+&lt;p&gt;JDK 本身没问题，是 &lt;strong&gt;NixOS 没有标准 Linux 的动态链接器&lt;/strong&gt;：&lt;/p&gt;</description></item><item><title>Getting Started</title><link>https://zlh20040308.github.io/note/getting-started/</link><pubDate>Thu, 25 Jun 2026 00:00:00 +0000</pubDate><guid>https://zlh20040308.github.io/note/getting-started/</guid><description>&lt;p&gt;This is my first note. Hugo with the &lt;a href="https://github.com/yihui/hugo-ivy"&gt;hugo-ivy&lt;/a&gt; theme looks clean.&lt;/p&gt;
 &lt;h2 id="how-to-create-a-new-note"&gt;How to create a new note&lt;/h2&gt;
 &lt;pre&gt;&lt;code class="language-bash"&gt;hugo new content note/my-note-title.md
 &lt;/code&gt;&lt;/pre&gt;
