@@ -1,0 +1,25 @@
+<!doctype html><html lang=en-US><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Tai-e Assignment 1: 活跃变量分析与迭代求解器 - Feng's Notes</title><meta property="og:title" content="Tai-e Assignment 1: 活跃变量分析与迭代求解器 - Feng's Notes"><meta name=twitter:card content="summary"><meta property="description" content="这次的实验是“函数填空”的类型，实验给出基础框架，我们实现关键函数。
+那了解这种项目最好的方式就是通过函数调用链一个个函数往上看，看看我们所实现的函数是怎么样被框架调用的。
+第一个小实验是实现活跃变量分析，具体来说是要实现 LiveVariableAnalysis 中的如下 API：
+[&mldr;] 我们可以在IDEA中通过将光标移动到函数名上再按 Alt + F7 快捷键来查看这个函数在哪 &amp;hellip;"><meta property="og:description" content="这次的实验是“函数填空”的类型，实验给出基础框架，我们实现关键函数。
+那了解这种项目最好的方式就是通过函数调用链一个个函数往上看，看看我们所实现的函数是怎么样被框架调用的。
+第一个小实验是实现活跃变量分析，具体来说是要实现 LiveVariableAnalysis 中的如下 API：
+[&mldr;] 我们可以在IDEA中通过将光标移动到函数名上再按 Alt + F7 快捷键来查看这个函数在哪 &amp;hellip;"><link rel=stylesheet href=//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/github.min.css><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css></head><body class=note><header class=masthead><h1><a href=/>Feng's Notes</a></h1><p class=tagline>Feng's personal notes</p><nav class=menu><input id=menu-check type=checkbox hidden>
+<label id=menu-label for=menu-check class=unselectable hidden><span class="icon close-icon">✕</span>
+<span class="icon open-icon">☰</span>
+<span class=text>Menu</span></label><ul><li><a href=/>Home</a></li><li><a href=/about/>About</a></li><li><a href=/categories/>Categories</a></li><li><a href=/tags/>Tags</a></li></ul></nav></header><article class=main><header class=title><h1>Tai-e Assignment 1: 活跃变量分析与迭代求解器</h1><h3>2026-07-03</h3><hr></header><h2 id=1-实验内容>1 实验内容</h2><ul><li>为 Java 实现一个活跃变量分析（Live Variable Analysis）。</li><li>实现一个通用的迭代求解器（Iterative Solver），用于求解数据流分析问题，也就是本次作业中的活跃变量分析。</li></ul><h2 id=2-实验概览>2 实验概览</h2><p>这次的实验是“函数填空”的类型，实验给出基础框架，我们实现关键函数。</p><p>那了解这种项目最好的方式就是通过函数调用链一个个函数往上看，看看我们所实现的函数是怎么样被框架调用的。</p><p>第一个小实验是实现活跃变量分析，具体来说是要实现 LiveVariableAnalysis 中的如下 API：</p><ul><li>SetFact newBoundaryFact(CFG)</li><li>SetFact newInitialFact()</li><li>void meetInto(SetFact,SetFact)</li><li>boolean transferNode(Stmt,SetFact,SetFact)</li></ul><p>我们可以在IDEA中通过将光标移动到函数名上再按 Alt + F7 快捷键来查看这个函数在哪些地方被调用了。</p><p>不过上面这几个函数并没有找到被调用的地方，那我们可以大胆猜测这些函数是为接下来要实现的迭代求解器服务的。</p><p>第二个小实验是要实现两个方法：</p><ul><li>Solver.initializeBackward(CFG,DataflowResult)</li><li>IterativeSolver.doSolveBackward(CFG,DataflowResult)</li></ul><p>首先看第一个方法所涉及到的函数调用链，自上而下依次是：</p><pre><code class=language-java>DataflowResult&lt;Node, Fact&gt; analyze(IR ir);
+
+DataflowResult&lt;Node, Fact&gt; solve(CFG&lt;Node&gt; cfg);
+
+DataflowResult&lt;Node, Fact&gt; initialize(CFG&lt;Node&gt; cfg);
+</code></pre><p>首先看第一个函数：</p><pre><code class=language-java>public DataflowResult&lt;Node, Fact&gt; analyze(IR ir) {
+    CFG&lt;Node&gt; cfg = ir.getResult(CFGBuilder.ID);
+    return solver.solve(cfg);
+}
+</code></pre><p>把IR转换成CFG，然后传给solver进行求解。</p><pre><code class=language-java>public DataflowResult&lt;Node, Fact&gt; solve(CFG&lt;Node&gt; cfg) {
+    DataflowResult&lt;Node, Fact&gt; result = initialize(cfg);
+    doSolve(cfg, result);
+    return result;
+}
+</code></pre><p>根据CFG初始化DataflowResult</p><ul><li>DataflowResult记录了CFG中所有Node的入口和出口的Fact。</li><li>Fact是数据流分析在每个程序点所要传播和计算的那条信息（比如活跃变量分析中，Fact 就是"当前语句处哪些变量是活跃的"）</li></ul><p>doSolve函数实际上调用的就是IterativeSolver.doSolveBackward(CFG,DataflowResult)，可想而知我们要在这个函数中实现我们所有的分析逻辑。</p><h2 id=3-实验过程重点>3 实验过程重点</h2><p>实验本身不难，基本上跟着文档把算法翻译一遍就行，虽说还是有一些API即便我看过注释也不太清楚是怎么用的，但是上手把玩两下基本上也搞明白了。</p><p>在做实验的过程中我发现我对于算法的有些地方的理解是错的，比如，假设有三个节点A、B、C，并且有A->B，C->B，当我尝试更新B的in fact的时候，我误以为要将A和C的out fact一起更新掉，但其实是不用的。</p><h2 id=4-杂项>4 杂项</h2><h2 id=41-调试>4.1 调试</h2><p>整个实验中，花时间最久的就是搞清楚该如何调试。</p><p>在调试的时候我尝试用print打印一些信息，但是结果发现日志全是乱的，这是因为分析的对象是一个java类，里面会有两个以上的方法：</p><ul><li>init() — 构造方法</li><li>func(&mldr;) — 业务方法</li></ul><p>AbstractDataflowAnalysis extends MethodAnalysis，框架会对被测程序的每个方法分别构建 CFG 并调用 solver.solve(cfg)，所以
+doSolveBackward 执行多次——一次一个方法。</p><p>这种情况下想要调试还是只能用设置断点这种方法。</p><footer><script src=//cdn.jsdelivr.net/combine/gh/highlightjs/cdn-release@11.7.0/build/highlight.min.js,npm/@xiee/utils/js/load-highlight.js defer></script><hr><div class=copyright>© <a href=https://github.com/zlh20040308>Feng</a> 2026</div></footer></article></body></html>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Assignment on Feng's Notes</title><link>https://zlh20040308.github.io/tags/assignment/</link><description>Recent content in Assignment on Feng's Notes</description><generator>Hugo</generator><language>en-US</language><lastBuildDate>Fri, 03 Jul 2026 00:00:00 +0800</lastBuildDate><atom:link href="https://zlh20040308.github.io/tags/assignment/index.xml" rel="self" type="application/rss+xml"/><item><title>Tai-e Assignment 1: 活跃变量分析与迭代求解器</title><link>https://zlh20040308.github.io/note/tai-e-assignment-1-%E6%B4%BB%E8%B7%83%E5%8F%98%E9%87%8F%E5%88%86%E6%9E%90%E4%B8%8E%E8%BF%AD%E4%BB%A3%E6%B1%82%E8%A7%A3%E5%99%A8/</link><pubDate>Fri, 03 Jul 2026 00:00:00 +0800</pubDate><guid>https://zlh20040308.github.io/note/tai-e-assignment-1-%E6%B4%BB%E8%B7%83%E5%8F%98%E9%87%8F%E5%88%86%E6%9E%90%E4%B8%8E%E8%BF%AD%E4%BB%A3%E6%B1%82%E8%A7%A3%E5%99%A8/</guid><description>&lt;h2 id="1-实验内容"&gt;1 实验内容&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;为 Java 实现一个活跃变量分析（Live Variable Analysis）。&lt;/li&gt;
+&lt;li&gt;实现一个通用的迭代求解器（Iterative Solver），用于求解数据流分析问题，也就是本次作业中的活跃变量分析。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="2-实验概览"&gt;2 实验概览&lt;/h2&gt;
+&lt;p&gt;这次的实验是“函数填空”的类型，实验给出基础框架，我们实现关键函数。&lt;/p&gt;
+&lt;p&gt;那了解这种项目最好的方式就是通过函数调用链一个个函数往上看，看看我们所实现的函数是怎么样被框架调用的。&lt;/p&gt;
+&lt;p&gt;第一个小实验是实现活跃变量分析，具体来说是要实现 LiveVariableAnalysis 中的如下 API：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;SetFact newBoundaryFact(CFG)&lt;/li&gt;
+&lt;li&gt;SetFact newInitialFact()&lt;/li&gt;
+&lt;li&gt;void meetInto(SetFact,SetFact)&lt;/li&gt;
+&lt;li&gt;boolean transferNode(Stmt,SetFact,SetFact)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;我们可以在IDEA中通过将光标移动到函数名上再按 Alt + F7 快捷键来查看这个函数在哪些地方被调用了。&lt;/p&gt;
+&lt;p&gt;不过上面这几个函数并没有找到被调用的地方，那我们可以大胆猜测这些函数是为接下来要实现的迭代求解器服务的。&lt;/p&gt;
+&lt;p&gt;第二个小实验是要实现两个方法：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Solver.initializeBackward(CFG,DataflowResult)&lt;/li&gt;
+&lt;li&gt;IterativeSolver.doSolveBackward(CFG,DataflowResult)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;首先看第一个方法所涉及到的函数调用链，自上而下依次是：&lt;/p&gt;
+&lt;pre&gt;&lt;code class="language-java"&gt;DataflowResult&amp;lt;Node, Fact&amp;gt; analyze(IR ir);
+
+DataflowResult&amp;lt;Node, Fact&amp;gt; solve(CFG&amp;lt;Node&amp;gt; cfg);
+
+DataflowResult&amp;lt;Node, Fact&amp;gt; initialize(CFG&amp;lt;Node&amp;gt; cfg);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;首先看第一个函数：&lt;/p&gt;
+&lt;pre&gt;&lt;code class="language-java"&gt;public DataflowResult&amp;lt;Node, Fact&amp;gt; analyze(IR ir) {
+ CFG&amp;lt;Node&amp;gt; cfg = ir.getResult(CFGBuilder.ID);
+ return solver.solve(cfg);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;把IR转换成CFG，然后传给solver进行求解。&lt;/p&gt;
+&lt;pre&gt;&lt;code class="language-java"&gt;public DataflowResult&amp;lt;Node, Fact&amp;gt; solve(CFG&amp;lt;Node&amp;gt; cfg) {
+ DataflowResult&amp;lt;Node, Fact&amp;gt; result = initialize(cfg);
+ doSolve(cfg, result);
+ return result;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;根据CFG初始化DataflowResult&lt;/p&gt;</description></item></channel></rss>
