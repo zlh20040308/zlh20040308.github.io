@@ -1,0 +1,29 @@
+<!doctype html><html lang=en-US><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Tai-e Assignment 2: 常量传播和 Worklist 求解器 - Feng's Notes</title><meta property="og:title" content="Tai-e Assignment 2: 常量传播和 Worklist 求解器 - Feng's Notes"><meta name=twitter:card content="summary"><meta property="description" content="基本上和上一个实验要做的事情一样，翻译下面这个算法：
+[&mldr;] 在实现 newBoundaryFact() 的时候，要小心地处理每个会被分析的方法的参数。具体来说，要将它们的值初始化为 NAC ，这是因为常量传播算法是个保守的must分析，而方法的参数的值肯定会被定义，但是我们又不可能得知他是不是个常量（又或者说就算知道了也不可能知道是哪个具体常量）。
+要做到这一点，我们就必须要知道一 &amp;hellip;"><meta property="og:description" content="基本上和上一个实验要做的事情一样，翻译下面这个算法：
+[&mldr;] 在实现 newBoundaryFact() 的时候，要小心地处理每个会被分析的方法的参数。具体来说，要将它们的值初始化为 NAC ，这是因为常量传播算法是个保守的must分析，而方法的参数的值肯定会被定义，但是我们又不可能得知他是不是个常量（又或者说就算知道了也不可能知道是哪个具体常量）。
+要做到这一点，我们就必须要知道一 &amp;hellip;"><link rel=stylesheet href=//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/github.min.css><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css></head><body class=note><header class=masthead><h1><a href=/>Feng's Notes</a></h1><p class=tagline>Feng's personal notes</p><nav class=menu><input id=menu-check type=checkbox hidden>
+<label id=menu-label for=menu-check class=unselectable hidden><span class="icon close-icon">✕</span>
+<span class="icon open-icon">☰</span>
+<span class=text>Menu</span></label><ul><li><a href=/>Home</a></li><li><a href=/about/>About</a></li><li><a href=/categories/>Categories</a></li><li><a href=/tags/>Tags</a></li></ul></nav></header><article class=main><header class=title><h1>Tai-e Assignment 2: 常量传播和 Worklist 求解器</h1><h3>2026-07-10</h3><hr></header><h2 id=1-实验内容>1 实验内容</h2><ul><li>为 Java 实现常量传播算法。</li><li>实现一个通用的 worklist 求解器，并用它来解决一些数据流分析问题，例如本次的常量传播。</li></ul><h2 id=2-实验概览>2 实验概览</h2><p>基本上和上一个实验要做的事情一样，翻译下面这个算法：</p><p><img src=./images/algorithm.png alt=常量传播算法伪代码></p><h2 id=3-实验过程重点>3 实验过程重点</h2><h3 id=构造-newboundaryfact>构造 newBoundaryFact</h3><p>在实现 newBoundaryFact() 的时候，要小心地处理每个会被分析的方法的参数。具体来说，要将它们的值初始化为 NAC ，这是因为常量传播算法是个保守的must分析，而方法的参数的值肯定会被定义，但是我们又不可能得知他是不是个常量（又或者说就算知道了也不可能知道是哪个具体常量）。</p><p>要做到这一点，我们就必须要知道一个方法中有哪些参数。</p><p>实验框架提供了 pascal.taie.ir.IR 这个类，里面有一个方法正好可以满足我们的需求：</p><pre><code class=language-java>/**
+ * @return the parameters in this IR (&quot;this&quot; variable is excluded).
+ * The order of the parameters in the resulting list is the same as
+ * the order they are declared in the method.
+ */
+List&lt;Var&gt; getParams();
+</code></pre><h3 id=transfernode-中对于-function-call-的处理>transferNode 中对于 function call 的处理</h3><p>讲义上有个地方我觉得写得有问题：</p><blockquote><ul><li>pascal.taie.ir.stmt.DefinitionStmt</li></ul><p>这是 Stmt 的一个子类。它表示了程序中所有的赋值语句，（即形如 x = y 或 x = m(…) 的语句）。这个类很简单。你可以通过阅读源码来决定如何使用它。</p></blockquote><p>我误以为 DefinitionStmt 都是由左值的，但是在看过源码之后发现并不是这样的：</p><pre><code class=language-java>public abstract class DefinitionStmt&lt;L extends LValue, R extends RValue&gt;
+        extends AbstractStmt {
+
+    /**
+     * @return the left-hand side expression. If this Stmt is an {@link Invoke}
+     * which does not have a left-hand side expression, e.g., o.m(...), then
+     * this method returns null; otherwise, it must return a non-null value.
+     */
+    public abstract @Nullable L getLValue();
+
+    /**
+     * @return the right-hand side expression.
+     */
+    public abstract R getRValue();
+}
+</code></pre><p>可以看到 DefinitionStmt 是可以没有左值的。这一点让我在实现 transferNode 这里迷糊了很久。</p><footer><script src=//cdn.jsdelivr.net/combine/gh/highlightjs/cdn-release@11.7.0/build/highlight.min.js,npm/@xiee/utils/js/load-highlight.js defer></script><hr><div class=copyright>© <a href=https://github.com/zlh20040308>Feng</a> 2026</div></footer></article></body></html>
