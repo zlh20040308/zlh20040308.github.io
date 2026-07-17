@@ -1,0 +1,25 @@
+<!doctype html><html lang=en-US><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Tai-e Assignment 4: 类层次结构分析与过程间常量传播 - Feng's Notes</title><meta property="og:title" content="Tai-e Assignment 4: 类层次结构分析与过程间常量传播 - Feng's Notes"><meta name=twitter:card content="summary"><meta property="description" content="我最疑惑不解的就是文档中的这段描述：
+[&mldr;] 那好，我们来看看这里对于 class type 的描述是什么：
+说实话，我没怎么看懂，只是感觉好像就是在描述“某个具体方法在哪个具体的类里”。
+当时也没多想，反正是翻译伪代码嘛，我也不管三七二十一，直接把对 special call 的处理翻译了出来。
+但是当我翻译下面这行伪代码的时候，我却犯了难：
+看这描述，我隐约有感觉是要通过 &amp;hellip;"><meta property="og:description" content="我最疑惑不解的就是文档中的这段描述：
+[&mldr;] 那好，我们来看看这里对于 class type 的描述是什么：
+说实话，我没怎么看懂，只是感觉好像就是在描述“某个具体方法在哪个具体的类里”。
+当时也没多想，反正是翻译伪代码嘛，我也不管三七二十一，直接把对 special call 的处理翻译了出来。
+但是当我翻译下面这行伪代码的时候，我却犯了难：
+看这描述，我隐约有感觉是要通过 &amp;hellip;"><link rel=stylesheet href=//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/github.min.css><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css></head><body class=note><header class=masthead><h1><a href=/>Feng's Notes</a></h1><p class=tagline>Feng's personal notes</p><nav class=menu><input id=menu-check type=checkbox hidden>
+<label id=menu-label for=menu-check class=unselectable hidden><span class="icon close-icon">✕</span>
+<span class="icon open-icon">☰</span>
+<span class=text>Menu</span></label><ul><li><a href=/>Home</a></li><li><a href=/about/>About</a></li><li><a href=/categories/>Categories</a></li><li><a href=/tags/>Tags</a></li></ul></nav></header><article class=main><header class=title><h1>Tai-e Assignment 4: 类层次结构分析与过程间常量传播</h1><h3>2026-07-16</h3><hr></header><h2 id=1-实验内容>1 实验内容</h2><ul><li>为 Java 实现一个类层次结构分析（Class Hierarchy Analysis，CHA）。</li><li>实现过程间常量传播。</li><li>实现过程间数据流传播的 worklist 求解器。</li></ul><h2 id=2-实验概览>2 实验概览</h2><h2 id=3-实验过程重点>3 实验过程重点</h2><h3 id=瞎猫碰上死耗子>瞎猫碰上死耗子</h3><p>我最疑惑不解的就是文档中的这段描述：</p><blockquote><ul><li>JClass getDeclaringClass()：返回该方法签名的声明类，即声明该方法的类。（也就是第 7 讲课件的第 24 页中所描述的 class type）；</li></ul></blockquote><p>那好，我们来看看这里对于 class type 的描述是什么：</p><p><img src=./images/class_type.png alt="class type"></p><p>说实话，我没怎么看懂，只是感觉好像就是在描述“某个具体方法在哪个具体的类里”。</p><p>当时也没多想，反正是翻译伪代码嘛，我也不管三七二十一，直接把对 special call 的处理翻译了出来。</p><p>但是当我翻译下面这行伪代码的时候，我却犯了难：</p><p><img src=./images/presedo_code.png alt="presedo code"></p><p>看这描述，我隐约有感觉是要通过 call site 来寻找这个 declared type，但是我找遍了 Invoke 这个类也没找到能返回 JClass 的方法。</p><p>后面尝试了很多稀奇古怪的方法，最终还是将目光落在了 JClass getDeclaringClass() 这个方法上。</p><p>为什么？</p><p>因为 declared type 和 getDeclaringClass 都有 declare 这个词缀，并且我要找的就是能返回 JClass 的方法。</p><p>真是太有理有据了，我简直就是天才，就这么干吧。</p><p>这也不能全怪我，主要是这个 getDeclaringClass 连个注释都没有，我实在不知道是用来干嘛的。</p><p>结果没想到真的成了，这就是我要找的那个方法。</p><h3 id=不太体面的实现>不太体面的实现</h3><pre><code class=language-java>protected CPFact transferCallEdge(CallEdge&lt;Stmt&gt; edge, CPFact callSiteOut) {
+    List&lt;RValue&gt; uses = edge.getSource().getUses();
+    List&lt;Var&gt; params = edge.getCallee().getIR().getParams();
+    CPFact newFact = new CPFact();
+    for (int i = 0; i &lt; params.size(); i++) {
+        if (uses.get(i) instanceof Var var) {
+            newFact.update(params.get(i), callSiteOut.get(var));
+        }
+    }
+    return newFact;
+}
+</code></pre><p>这个函数实现的有些“不太体面”，这里之所以能这样处理的前提是实参是按顺序放在 uses 里面的，但是这一点并没有在注释和文档中提到，但是我觉得既然都已经有了CallEdge<stmt>这种抽象了，为何不直接把对应关系放入这个对象里呢？</p><h2 id=4-碎碎念>4 碎碎念</h2><p>总的来说这个实验还是花了我很多时间的，很多时候为了知道一个对象能提供哪些信息就直接一股脑地把所有方法调用一边再设个断点在调试器里一个个看。。。感觉不是一种健康的 working flow。</p><p>希望有一种 ai 可以一直看着我写代码，指出我工作流上的一些不足的地方。</p><footer><script src=//cdn.jsdelivr.net/combine/gh/highlightjs/cdn-release@11.7.0/build/highlight.min.js,npm/@xiee/utils/js/load-highlight.js defer></script><hr><div class=copyright>© <a href=https://github.com/zlh20040308>Feng</a> 2026</div></footer></article></body></html>

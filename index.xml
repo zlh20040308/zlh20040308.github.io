@@ -1,4 +1,45 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Home on Feng's Notes</title><link>https://zlh20040308.github.io/</link><description>Recent content in Home on Feng's Notes</description><generator>Hugo</generator><language>en-US</language><lastBuildDate>Sun, 12 Jul 2026 19:03:41 +0800</lastBuildDate><atom:link href="https://zlh20040308.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>Tai-e Assignment 3: 死代码检测</title><link>https://zlh20040308.github.io/note/tai-e-assignment-3-%E6%AD%BB%E4%BB%A3%E7%A0%81%E6%A3%80%E6%B5%8B/</link><pubDate>Sun, 12 Jul 2026 19:03:41 +0800</pubDate><guid>https://zlh20040308.github.io/note/tai-e-assignment-3-%E6%AD%BB%E4%BB%A3%E7%A0%81%E6%A3%80%E6%B5%8B/</guid><description>&lt;h2 id="1-实验内容"&gt;1 实验内容&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Home on Feng's Notes</title><link>https://zlh20040308.github.io/</link><description>Recent content in Home on Feng's Notes</description><generator>Hugo</generator><language>en-US</language><lastBuildDate>Thu, 16 Jul 2026 19:03:41 +0800</lastBuildDate><atom:link href="https://zlh20040308.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>Tai-e Assignment 4: 类层次结构分析与过程间常量传播</title><link>https://zlh20040308.github.io/note/tai-e-assignment-4-%E7%B1%BB%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90%E4%B8%8E%E8%BF%87%E7%A8%8B%E9%97%B4%E5%B8%B8%E9%87%8F%E4%BC%A0%E6%92%AD/</link><pubDate>Thu, 16 Jul 2026 19:03:41 +0800</pubDate><guid>https://zlh20040308.github.io/note/tai-e-assignment-4-%E7%B1%BB%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90%E4%B8%8E%E8%BF%87%E7%A8%8B%E9%97%B4%E5%B8%B8%E9%87%8F%E4%BC%A0%E6%92%AD/</guid><description>&lt;h2 id="1-实验内容"&gt;1 实验内容&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;为 Java 实现一个类层次结构分析（Class Hierarchy Analysis，CHA）。&lt;/li&gt;
+&lt;li&gt;实现过程间常量传播。&lt;/li&gt;
+&lt;li&gt;实现过程间数据流传播的 worklist 求解器。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="2-实验概览"&gt;2 实验概览&lt;/h2&gt;
+&lt;h2 id="3-实验过程重点"&gt;3 实验过程重点&lt;/h2&gt;
+&lt;h3 id="瞎猫碰上死耗子"&gt;瞎猫碰上死耗子&lt;/h3&gt;
+&lt;p&gt;我最疑惑不解的就是文档中的这段描述：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;JClass getDeclaringClass()：返回该方法签名的声明类，即声明该方法的类。（也就是第 7 讲课件的第 24 页中所描述的 class type）；&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;那好，我们来看看这里对于 class type 的描述是什么：&lt;/p&gt;
+&lt;p&gt;&lt;img src="./images/class_type.png" alt="class type"&gt;&lt;/p&gt;
+&lt;p&gt;说实话，我没怎么看懂，只是感觉好像就是在描述“某个具体方法在哪个具体的类里”。&lt;/p&gt;
+&lt;p&gt;当时也没多想，反正是翻译伪代码嘛，我也不管三七二十一，直接把对 special call 的处理翻译了出来。&lt;/p&gt;
+&lt;p&gt;但是当我翻译下面这行伪代码的时候，我却犯了难：&lt;/p&gt;
+&lt;p&gt;&lt;img src="./images/presedo_code.png" alt="presedo code"&gt;&lt;/p&gt;
+&lt;p&gt;看这描述，我隐约有感觉是要通过 call site 来寻找这个 declared type，但是我找遍了 Invoke 这个类也没找到能返回 JClass 的方法。&lt;/p&gt;
+&lt;p&gt;后面尝试了很多稀奇古怪的方法，最终还是将目光落在了 JClass getDeclaringClass() 这个方法上。&lt;/p&gt;
+&lt;p&gt;为什么？&lt;/p&gt;
+&lt;p&gt;因为 declared type 和 getDeclaringClass 都有 declare 这个词缀，并且我要找的就是能返回 JClass 的方法。&lt;/p&gt;
+&lt;p&gt;真是太有理有据了，我简直就是天才，就这么干吧。&lt;/p&gt;
+&lt;p&gt;这也不能全怪我，主要是这个 getDeclaringClass 连个注释都没有，我实在不知道是用来干嘛的。&lt;/p&gt;
+&lt;p&gt;结果没想到真的成了，这就是我要找的那个方法。&lt;/p&gt;
+&lt;h3 id="不太体面的实现"&gt;不太体面的实现&lt;/h3&gt;
+&lt;pre&gt;&lt;code class="language-java"&gt;protected CPFact transferCallEdge(CallEdge&amp;lt;Stmt&amp;gt; edge, CPFact callSiteOut) {
+ List&amp;lt;RValue&amp;gt; uses = edge.getSource().getUses();
+ List&amp;lt;Var&amp;gt; params = edge.getCallee().getIR().getParams();
+ CPFact newFact = new CPFact();
+ for (int i = 0; i &amp;lt; params.size(); i++) {
+ if (uses.get(i) instanceof Var var) {
+ newFact.update(params.get(i), callSiteOut.get(var));
+ }
+ }
+ return newFact;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;这个函数实现的有些“不太体面”，这里之所以能这样处理的前提是实参是按顺序放在 uses 里面的，但是这一点并没有在注释和文档中提到，但是我觉得既然都已经有了CallEdge&lt;Stmt&gt;这种抽象了，为何不直接把对应关系放入这个对象里呢？&lt;/p&gt;</description></item><item><title>Tai-e Assignment 3: 死代码检测</title><link>https://zlh20040308.github.io/note/tai-e-assignment-3-%E6%AD%BB%E4%BB%A3%E7%A0%81%E6%A3%80%E6%B5%8B/</link><pubDate>Sun, 12 Jul 2026 19:03:41 +0800</pubDate><guid>https://zlh20040308.github.io/note/tai-e-assignment-3-%E6%AD%BB%E4%BB%A3%E7%A0%81%E6%A3%80%E6%B5%8B/</guid><description>&lt;h2 id="1-实验内容"&gt;1 实验内容&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;为 Java 实现一个死代码（dead code）检测算法。&lt;/li&gt;
 &lt;/ul&gt;
@@ -21,7 +62,7 @@
 &lt;h2 id="3-实验过程重点"&gt;3 实验过程重点&lt;/h2&gt;
 &lt;h3 id="判别一个语句是否是一个基本块的最后一句"&gt;判别一个语句是否是一个基本块的最后一句&lt;/h3&gt;
 &lt;p&gt;在实现分支不可达代码检测时，在检测到某个分支永远不会被执行之后，需要将这个分支所在的 basic block 中的所有 stmt 都加入 dead code，在添加的时候，我们需要判断此时所遍历到的 stmt 是不是该 basic block 中的最后一条 stmt。&lt;/p&gt;</description></item><item><title>大学四年回忆录</title><link>https://zlh20040308.github.io/post/%E5%A4%A7%E5%AD%A6%E5%9B%9B%E5%B9%B4%E5%9B%9E%E5%BF%86%E5%BD%95/</link><pubDate>Sat, 11 Jul 2026 00:00:00 +0800</pubDate><guid>https://zlh20040308.github.io/post/%E5%A4%A7%E5%AD%A6%E5%9B%9B%E5%B9%B4%E5%9B%9E%E5%BF%86%E5%BD%95/</guid><description>&lt;p&gt;虽说我对于大学本身没啥留恋的，但是这四年的时光多多少少还是让我成长了许多，趁着还没忘记，记录一下。&lt;/p&gt;
-&lt;h2 id="第一章-择校"&gt;第一章 择校&lt;/h2&gt;
+&lt;h2 id="择校"&gt;择校&lt;/h2&gt;
 &lt;p&gt;高考完之后，我其实并没有想过将来要从事什么专业，我是2022年入学的，那个时候应该还是互联网行业最鼎盛的时期，不过选择计算机倒也不是追风口，纯粹只是经过排除法之后剩下来的结果。实际上，我当时对于计算机一无所知，甚至在人生的前十八年，我都没有正儿八经地用过电脑，就连电脑游戏也没咋玩过。&lt;/p&gt;
 &lt;p&gt;至于学校，当时分数出来后我就知道大概率也就是个末流一本或者是顶流二本，所以我也就不对教学质量抱有什么期望了，想着找个生活质量高点的大学安逸地度过四年，综上，我对于大学的期望有以下几点：&lt;/p&gt;
 &lt;ol&gt;
@@ -81,6 +122,7 @@
 &lt;p&gt;这学期在做的事情主要就三件事：做ysyx、学Rust、做rCore。&lt;/p&gt;
 &lt;p&gt;我学得不亦乐乎，尤其是ysyx，由于我的进度不错，成功申请到了寒假前往线下基地学习的机会。&lt;/p&gt;
 &lt;h2 id="大三下"&gt;大三下&lt;/h2&gt;
+&lt;p&gt;这个学期学的课有：编译原理。&lt;/p&gt;
 &lt;p&gt;寒假在线下基地与助教沟通过后，我知道了想要在体系结构这个领域混口饭吃，还是得要有个硕士文凭。&lt;/p&gt;
 &lt;p&gt;理应来说我现在有动机，是时候开始备考了是吧。&lt;/p&gt;</description></item><item><title>Tai-e Assignment 2: 常量传播和 Worklist 求解器</title><link>https://zlh20040308.github.io/note/tai-e-assignment-2-%E5%B8%B8%E9%87%8F%E4%BC%A0%E6%92%AD%E5%92%8C-worklist-%E6%B1%82%E8%A7%A3%E5%99%A8/</link><pubDate>Fri, 10 Jul 2026 00:00:00 +0800</pubDate><guid>https://zlh20040308.github.io/note/tai-e-assignment-2-%E5%B8%B8%E9%87%8F%E4%BC%A0%E6%92%AD%E5%92%8C-worklist-%E6%B1%82%E8%A7%A3%E5%99%A8/</guid><description>&lt;h2 id="1-实验内容"&gt;1 实验内容&lt;/h2&gt;
 &lt;ul&gt;
