@@ -1,0 +1,25 @@
+<!doctype html><html lang=en-US><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Tai-e Assignment 5: 非上下文敏感指针分析 - Feng's Notes</title><meta property="og:title" content="Tai-e Assignment 5: 非上下文敏感指针分析 - Feng's Notes"><meta name=twitter:card content="summary"><meta property="description" content="
+这里要注意的一点是我们并不需要显式地实现下面这行伪代码：
+因为当我们将当前 method 加入 reachable methods 中时，其实就已经相当于把这个 method 中的 statments 加入到了 reachable statments 里面了，后面要用到这个集合的时候其实也是用来遍历与判重：
+我们可以用这种方法来遍历 reachable statments ： &amp;hellip;"><meta property="og:description" content="
+这里要注意的一点是我们并不需要显式地实现下面这行伪代码：
+因为当我们将当前 method 加入 reachable methods 中时，其实就已经相当于把这个 method 中的 statments 加入到了 reachable statments 里面了，后面要用到这个集合的时候其实也是用来遍历与判重：
+我们可以用这种方法来遍历 reachable statments ： &amp;hellip;"><link rel=stylesheet href=//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/github.min.css><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css></head><body class=note><header class=masthead><h1><a href=/>Feng's Notes</a></h1><p class=tagline>Feng's personal notes</p><nav class=menu><input id=menu-check type=checkbox hidden>
+<label id=menu-label for=menu-check class=unselectable hidden><span class="icon close-icon">✕</span>
+<span class="icon open-icon">☰</span>
+<span class=text>Menu</span></label><ul><li><a href=/>Home</a></li><li><a href=/about/>About</a></li><li><a href=/categories/>Categories</a></li><li><a href=/tags/>Tags</a></li></ul></nav></header><article class=main><header class=title><h1>Tai-e Assignment 5: 非上下文敏感指针分析</h1><h3>2026-07-21</h3><hr></header><h2 id=1-实验内容>1 实验内容</h2><ul><li>为 Java 实现非上下文敏感的指针分析。</li><li>为指针分析实现一个调用图的实时构建算法。</li></ul><h2 id=2-实验概览>2 实验概览</h2><h2 id=3-实验过程重点>3 实验过程重点</h2><h3 id=实现-addreachable-函数>实现 AddReachable 函数</h3><p><img src=./images/addreachable.png alt="alt text"></p><p>这里要注意的一点是我们并不需要显式地实现下面这行伪代码：</p><p><img src=./images/stmt.png alt="alt text"></p><p>因为当我们将当前 method 加入 reachable methods 中时，其实就已经相当于把这个 method 中的 statments 加入到了 reachable statments 里面了，后面要用到这个集合的时候其实也是用来遍历与判重：</p><p><img src=./images/use_stmt.png alt="alt text"></p><p>我们可以用这种方法来遍历 reachable statments ：</p><pre><code class=language-java>callGraph.reachableMethods().forEach(method -&gt; {
+    method.getIR().getStmts().forEach(stmt -&gt; {
+        ...
+    });
+});
+</code></pre><p>注意先将需要处理的 stmt 从里面取出来存好再进行处理，因为如果直接在里面进行处理的话，由于你可能会在不经意间执行 addReachableMethod 这种操作，这会触发并发修改异常（java.util.ConcurrentModificationException）。</p><h3 id=处理静态方法>处理静态方法</h3><p>在实现 void addReachable(JMethod) 的时候，要注意将该方法中所涉及到的静态方法加入到 ReachableMethod ，因为他不像普通方法调用一样，它是可以没有 receiver valuable 的，所以不会在 processCall 函数中被加入到 callGraph 中。但也正是因为这一点，我们可以在通过 addReachable 来将它们加入到 ReachableMethod 中。</p><p>伪代码如下：</p><pre><code>AddReachable(m)
+    if m ∉ RM then
+        add m to RM
+        𝑆 ∪= 𝑆𝑚
+        foreach i: x = new T() ∈ 𝑆𝑚 do
+            add &lt;𝑥, {𝑜𝑖}&gt; to WL
+        foreach x = y ∈ 𝑆𝑚 do
+            AddEdge(y, x)
+        foreach m_static ∈ 𝑆𝑚 do
+            AddReachable(m_static)
+</code></pre><footer><script src=//cdn.jsdelivr.net/combine/gh/highlightjs/cdn-release@11.7.0/build/highlight.min.js,npm/@xiee/utils/js/load-highlight.js defer></script><hr><div class=copyright>© <a href=https://github.com/zlh20040308>Feng</a> 2026</div></footer></article></body></html>

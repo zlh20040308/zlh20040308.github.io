@@ -1,4 +1,27 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Tai-E on Feng's Notes</title><link>https://zlh20040308.github.io/tags/tai-e/</link><description>Recent content in Tai-E on Feng's Notes</description><generator>Hugo</generator><language>en-US</language><lastBuildDate>Thu, 16 Jul 2026 19:03:41 +0800</lastBuildDate><atom:link href="https://zlh20040308.github.io/tags/tai-e/index.xml" rel="self" type="application/rss+xml"/><item><title>Tai-e Assignment 4: 类层次结构分析与过程间常量传播</title><link>https://zlh20040308.github.io/note/tai-e-assignment-4-%E7%B1%BB%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90%E4%B8%8E%E8%BF%87%E7%A8%8B%E9%97%B4%E5%B8%B8%E9%87%8F%E4%BC%A0%E6%92%AD/</link><pubDate>Thu, 16 Jul 2026 19:03:41 +0800</pubDate><guid>https://zlh20040308.github.io/note/tai-e-assignment-4-%E7%B1%BB%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90%E4%B8%8E%E8%BF%87%E7%A8%8B%E9%97%B4%E5%B8%B8%E9%87%8F%E4%BC%A0%E6%92%AD/</guid><description>&lt;h2 id="1-实验内容"&gt;1 实验内容&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Tai-E on Feng's Notes</title><link>https://zlh20040308.github.io/tags/tai-e/</link><description>Recent content in Tai-E on Feng's Notes</description><generator>Hugo</generator><language>en-US</language><lastBuildDate>Tue, 21 Jul 2026 07:03:41 +0800</lastBuildDate><atom:link href="https://zlh20040308.github.io/tags/tai-e/index.xml" rel="self" type="application/rss+xml"/><item><title>Tai-e Assignment 5: 非上下文敏感指针分析</title><link>https://zlh20040308.github.io/note/tai-e-assignment-5-%E9%9D%9E%E4%B8%8A%E4%B8%8B%E6%96%87%E6%95%8F%E6%84%9F%E6%8C%87%E9%92%88%E5%88%86%E6%9E%90/</link><pubDate>Tue, 21 Jul 2026 07:03:41 +0800</pubDate><guid>https://zlh20040308.github.io/note/tai-e-assignment-5-%E9%9D%9E%E4%B8%8A%E4%B8%8B%E6%96%87%E6%95%8F%E6%84%9F%E6%8C%87%E9%92%88%E5%88%86%E6%9E%90/</guid><description>&lt;h2 id="1-实验内容"&gt;1 实验内容&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;为 Java 实现非上下文敏感的指针分析。&lt;/li&gt;
+&lt;li&gt;为指针分析实现一个调用图的实时构建算法。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="2-实验概览"&gt;2 实验概览&lt;/h2&gt;
+&lt;h2 id="3-实验过程重点"&gt;3 实验过程重点&lt;/h2&gt;
+&lt;h3 id="实现-addreachable-函数"&gt;实现 AddReachable 函数&lt;/h3&gt;
+&lt;p&gt;&lt;img src="./images/addreachable.png" alt="alt text"&gt;&lt;/p&gt;
+&lt;p&gt;这里要注意的一点是我们并不需要显式地实现下面这行伪代码：&lt;/p&gt;
+&lt;p&gt;&lt;img src="./images/stmt.png" alt="alt text"&gt;&lt;/p&gt;
+&lt;p&gt;因为当我们将当前 method 加入 reachable methods 中时，其实就已经相当于把这个 method 中的 statments 加入到了 reachable statments 里面了，后面要用到这个集合的时候其实也是用来遍历与判重：&lt;/p&gt;
+&lt;p&gt;&lt;img src="./images/use_stmt.png" alt="alt text"&gt;&lt;/p&gt;
+&lt;p&gt;我们可以用这种方法来遍历 reachable statments ：&lt;/p&gt;
+&lt;pre&gt;&lt;code class="language-java"&gt;callGraph.reachableMethods().forEach(method -&amp;gt; {
+ method.getIR().getStmts().forEach(stmt -&amp;gt; {
+ ...
+ });
+});
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;注意先将需要处理的 stmt 从里面取出来存好再进行处理，因为如果直接在里面进行处理的话，由于你可能会在不经意间执行 addReachableMethod 这种操作，这会触发并发修改异常（java.util.ConcurrentModificationException）。&lt;/p&gt;
+&lt;h3 id="处理静态方法"&gt;处理静态方法&lt;/h3&gt;
+&lt;p&gt;在实现 void addReachable(JMethod) 的时候，要注意将该方法中所涉及到的静态方法加入到 ReachableMethod ，因为他不像普通方法调用一样，它是可以没有 receiver valuable 的，所以不会在 processCall 函数中被加入到 callGraph 中。但也正是因为这一点，我们可以在通过 addReachable 来将它们加入到 ReachableMethod 中。&lt;/p&gt;
+&lt;p&gt;伪代码如下：&lt;/p&gt;</description></item><item><title>Tai-e Assignment 4: 类层次结构分析与过程间常量传播</title><link>https://zlh20040308.github.io/note/tai-e-assignment-4-%E7%B1%BB%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90%E4%B8%8E%E8%BF%87%E7%A8%8B%E9%97%B4%E5%B8%B8%E9%87%8F%E4%BC%A0%E6%92%AD/</link><pubDate>Thu, 16 Jul 2026 19:03:41 +0800</pubDate><guid>https://zlh20040308.github.io/note/tai-e-assignment-4-%E7%B1%BB%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90%E4%B8%8E%E8%BF%87%E7%A8%8B%E9%97%B4%E5%B8%B8%E9%87%8F%E4%BC%A0%E6%92%AD/</guid><description>&lt;h2 id="1-实验内容"&gt;1 实验内容&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;为 Java 实现一个类层次结构分析（Class Hierarchy Analysis，CHA）。&lt;/li&gt;
 &lt;li&gt;实现过程间常量传播。&lt;/li&gt;
